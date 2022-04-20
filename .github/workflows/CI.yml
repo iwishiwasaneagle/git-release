@@ -9,7 +9,7 @@ jobs:
   CI:
     strategy:
       matrix:
-        os: [ubuntu-latest, ubuntu-20.04, ubuntu-18.04]
+        os: [ubuntu-latest, ubuntu-20.04, ubuntu-18.04, macos-latest]
         cliffversion : [latest, "0.6.1"]
     runs-on: ${{ matrix.os }}
     steps:
