@@ -44,4 +44,4 @@ jobs:
         run: sudo make install
 
       - name: Run git-release
-        run:  git release v0.0.0
+        run:  git release v90.90.90
