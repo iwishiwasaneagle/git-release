@@ -22,7 +22,7 @@ SKIP_CLI=""
 SIGN=""
 NOVERIFY="--no-verify"
 
-TEMP=$(getopt -n release --long verify,skip-cli,message: -o sm: -- "$@")
+TEMP=$(getopt -n release --long help,verify,skip-cli,message: -o shm: -- "$@")
 eval set -- "$TEMP"
 
 while true; do
@@ -56,8 +56,12 @@ if command -v pre-commit &> /dev/null; then
     pre-commit uninstall
 fi
 
-git-cliff --tag "$1" > CHANGELOG.md
-git commit CHANGELOG.md -m "chore(release): prepare for $1 $SKIP_CLI"
+CHANGELOG_FILE="CHANGELOG.md"
+git-cliff --tag "$1" > "$CHANGELOG_FILE"
+if ! git ls-files --error-unmatch "$CHANGELOG_FILE" &> /dev/null; then
+    git add "$CHANGELOG_FILE"
+fi
+git commit "$CHANGELOG_FILE" -m "chore(release): prepare for $1 $SKIP_CLI"
 git show
 
 # generate a changelog for the tag message based on the following template
@@ -72,8 +76,8 @@ export TEMPLATE="\
 if [[ -z "$MESSAGE" ]]; then
     MESSAGE=$(git-cliff --unreleased --strip all)
 fi
+
 # create a signed tag
-# https://keyserver.ubuntu.com/pks/lookup?search=0x4A92FA17B6619297&op=vindex
 git tag "$SIGN" -a "$1" -m "Release $1" -m "$MESSAGE"
 git tag -v "$1"
 git push "$NOVERIFY" origin $(git branch --show-current) "$1"
