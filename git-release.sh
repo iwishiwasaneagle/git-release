@@ -61,7 +61,7 @@ git-cliff --tag "$1" > "$CHANGELOG_FILE"
 if ! git ls-files --error-unmatch "$CHANGELOG_FILE" &> /dev/null; then
     git add "$CHANGELOG_FILE"
 fi
-git commit "$CHANGELOG_FILE" -m "chore(release): prepare for $1 $SKIP_CI"
+git commit $SIGN "$CHANGELOG_FILE" -m "chore(release): prepare for $1 $SKIP_CI"
 git show
 
 # generate a changelog for the tag message based on the following template
@@ -81,7 +81,9 @@ fi
 
 # create a signed tag
 git tag $SIGN -a "$1" -m "Release $1" -m "$MESSAGE"
-git tag -v "$1"
+if [[ ! -z "$SIGN"]]; then
+    git tag -v "$1"
+fi
 git push $NOVERIFY origin $(git branch --show-current) "$1"
 
 if command -v pre-commit &> /dev/null; then
