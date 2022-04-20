@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+jobs:
+  CI:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-20.04, ubuntu-18.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Generate data
+        run: |
+          git config --global user.email "djchentulmen@fia.org"
+          git config --global user.name "Niki Lauda"
+          git switch -c rawe-ceek
+          seq 100 > seq.txt
+          git add seq.txt
+          git commit seq.txt -m "um"
+          git switch master
+
+      - name: Install git-smash
+        run: sudo make install
+
+      - name: Run git-smash
+        run:  git smash -ur -m "um" --force rawe-ceek
+        env:
+          TERM: dumb
