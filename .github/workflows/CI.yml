@@ -25,11 +25,12 @@ jobs:
           key: ${{ runner.os }}-cargo-cliff-v${{ matrix.cliffversion}}
 
       - name: Install dependencies
-        uses: actions-rs/install@v0.1
-        with:
-          crate: git-cliff
-          use-tool-cache: true
-          version: ${{ matrix.cliffversion }}
+        run: |
+          if [[ "${{ matrix.cliffversion }}" == "latest" ]]; then
+            cargo install git-cliff
+          else
+            cargo install --version ${{ matrix.cliffversion }} git-cliff
+          fi
 
       - name: Create test environment
         run: |
