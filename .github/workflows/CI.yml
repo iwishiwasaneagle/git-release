@@ -42,9 +42,7 @@ jobs:
 
       - name: Setup git user with signing
         run: |
-          git config --global user.email "djchentulmen@fia.org"
-          git config --global user.name "Niki Lauda"
-          gpg --batch --gen-key <<EOF
+          gpg --batch --gen-key <<-END
             %no-protection
             Key-Type: 1
             Key-Length: 2048
@@ -53,15 +51,19 @@ jobs:
             Name-Real: Niki Lauda
             Name-Email: djchentulmen@fia.org
             Expire-Date: 0
-            EOF
-          git config --global user.signingkey $(gpg --list-secret-keys --keyid-format=long jh.ewers@gmail.com | grep 'sec' | awk 'match($0, /[0-9A-Z]{16}/) {print substr($0, RSTART, RLENGTH)}')
+          END
+          git config --global user.signingkey $(gpg --list-secret-keys --keyid-format=long djchentulmen@fia.org | grep 'sec' | awk 'match($0, /[0-9A-Z]{16}/) {print substr($0, RSTART, RLENGTH)}')
 
       - name: Create test environment
         run: |
+          git config --global user.email "djchentulmen@fia.org"
+          git config --global user.name "Niki Lauda"
+
           cd ..
           git clone git-release/ git-release-test
           cd git-release-test
           git remote rm origin
+
           cd ../git-release
           git remote rename origin origin-renamed
           git remote add origin ../git-release-test
