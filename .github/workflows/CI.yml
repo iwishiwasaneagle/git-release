@@ -10,24 +10,36 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, ubuntu-20.04, ubuntu-18.04]
+        cliffversion : [latest, "0.6.1"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
 
-      - name: Generate data
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: git-cliff
+          version: ${{ matrix.cliffversion }}
+          use-tool-cache: true
+
+      - name: Create test environment
         run: |
+          cd ..
+          git clone git-release/ git-release-test
+          cd git-release-test
+          git remote rm origin
+          cd ../git-release
           git config --global user.email "djchentulmen@fia.org"
           git config --global user.name "Niki Lauda"
+          git remote rename origin origin-renamed
+          git remote add origin ../git-release-test
+
           git switch -c rawe-ceek
           seq 100 > seq.txt
           git add seq.txt
-          git commit seq.txt -m "um"
-          git switch master
+          git commit seq.txt -m "feat: test-data"
 
-      - name: Install git-smash
+      - name: Install git-release
         run: sudo make install
 
-      - name: Run git-smash
-        run:  git smash -ur -m "um" --force rawe-ceek
-        env:
-          TERM: dumb
+      - name: Run git-release
+        run:  git release v0.0.0
