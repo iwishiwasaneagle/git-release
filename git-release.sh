@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 function usage() {
     cat<<HELPUSAGE
@@ -8,21 +8,21 @@ git release [options] <tagname>
 
 Options
         --verify       Run git hooks. Default skips. WARNING: Tags and that may need to be deleted if a hook is run and it fails the push/tag creation/commit/etc.
-        --skip-cli     Add a message to the commit to skip the pre-commit ci (only relevant if you are using pre-commit ci
+        --no-skip-ci   Don't add a message to the commit to skip the pre-commit ci (only relevant if you are using pre-commit ci
 
 Tag options
         -m, --message <message>   Tag message (defaults to changelog)
-        -s                        Sign the tag
+        --no-sign                 Don't sign the tag
 
 HELPUSAGE
 }
 
 MESSAGE=""
-SKIP_CLI=""
-SIGN=""
+SKIP_CI="[skip pre-commit.ci]"
+SIGN="-s"
 NOVERIFY="--no-verify"
 
-TEMP=$(getopt -n release --long help,verify,skip-cli,message: -o shm: -- "$@")
+TEMP=$(getopt -n release --long help,verify,no-sign,skip-ci,message: -o hm: -- "$@")
 eval set -- "$TEMP"
 
 while true; do
@@ -35,12 +35,12 @@ while true; do
             MESSAGE="$2"
             shift 2;
             ;;
-        --skip-cli )
-            SKIP_CLI="[skip pre-commit.ci]"
+        --no-skip-ci )
+            SKIP_CI=""
             shift 1;
             ;;
-        -s )
-            SIGN="-s"
+        --no-sign )
+            SIGN=""
             shift 1;
             ;;
         --verify )
@@ -61,7 +61,7 @@ git-cliff --tag "$1" > "$CHANGELOG_FILE"
 if ! git ls-files --error-unmatch "$CHANGELOG_FILE" &> /dev/null; then
     git add "$CHANGELOG_FILE"
 fi
-git commit "$CHANGELOG_FILE" -m "chore(release): prepare for $1 $SKIP_CLI"
+git commit "$CHANGELOG_FILE" -m "chore(release): prepare for $1 $SKIP_CI"
 git show
 
 # generate a changelog for the tag message based on the following template
@@ -80,9 +80,8 @@ if [[ -z "$MESSAGE" ]]; then
 fi
 
 # create a signed tag
-git tag "$SIGN" -a "$1" -m "Release $1" -m "$MESSAGE"
-git tag -v "$1"
-git push "$NOVERIFY" origin $(git branch --show-current) "$1"
+git tag $SIGN -a "$1" -m "Release $1" -m "$MESSAGE"
+git push $NOVERIFY origin $(git branch --show-current) "$1"
 
 if command -v pre-commit &> /dev/null; then
     pre-commit install
