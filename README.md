@@ -1,4 +1,4 @@
-# Git Smash
+# git-release
 
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/iwishiwasaneagle/git-release/master.svg)](https://results.pre-commit.ci/latest/github/iwishiwasaneagle/git-release/master)
 [![CI](https://github.com/iwishiwasaneagle/git-release/actions/workflows/CI.yml/badge.svg)](https://github.com/iwishiwasaneagle/git-release/actions/workflows/CI.yml)
