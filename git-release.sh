@@ -7,12 +7,12 @@ function usage() {
 git release [options] <tagname>
 
 Options
-        --verify       Run git hooks. Default skips. WARNING: Tags and that may need to be deleted if a hook is run and it fails the push/tag creation/commit/etc.
-        --no-skip-ci   Don't add a message to the commit to skip the pre-commit ci (only relevant if you are using pre-commit ci
+    --verify       Run git hooks. Default skips. WARNING: Tags and that may need to be deleted if a hook is run and it fails the push/tag creation/commit/etc.
+    --no-skip-ci   Don't add a message to the commit to skip the pre-commit ci (only relevant if you are using pre-commit ci
 
 Tag options
-        -m, --message <message>   Tag message (defaults to changelog)
-        --no-sign                 Don't sign the tag
+    -m, --message <message>   Tag message (defaults to changelog)
+    --no-sign                 Don't sign the tag
 
 HELPUSAGE
 }
