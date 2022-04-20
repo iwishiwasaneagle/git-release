@@ -162,3 +162,7 @@ pre-commit installed at .git/hooks/pre-commit
 ```
 
 </details>
+
+## Repos that have used git-release
+
+- [iwishiwasaneagle/jsim](https://github.com/iwishiwasaneagle/jsim)
