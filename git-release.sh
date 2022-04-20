@@ -81,6 +81,7 @@ fi
 
 # create a signed tag
 git tag $SIGN -a "$1" -m "Release $1" -m "$MESSAGE"
+git tag -v "$1"
 git push $NOVERIFY origin $(git branch --show-current) "$1"
 
 if command -v pre-commit &> /dev/null; then
