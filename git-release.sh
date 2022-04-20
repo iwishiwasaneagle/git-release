@@ -71,7 +71,7 @@ export TEMPLATE=$(cat <<END
 {% for commit in commits %}
 - {{ commit.message | upper_first }} ({{ commit.id | truncate(length=7, end="") }})
 {% endfor %}
-{% endfor %}"
+{% endfor %}
 END
 )
 
