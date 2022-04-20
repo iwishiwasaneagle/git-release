@@ -40,6 +40,22 @@ jobs:
             cargo install --version ${{ matrix.cliffversion }} git-cliff
           fi
 
+      - name: Setup git user with signing
+        run: |
+          git config --global user.email "djchentulmen@fia.org"
+          git config --global user.name "Niki Lauda"
+          gpg --batch --gen-key <<EOF
+            %no-protection
+            Key-Type: 1
+            Key-Length: 2048
+            Subkey-Type: 1
+            Subkey-Length: 2048
+            Name-Real: Niki Lauda
+            Name-Email: djchentulmen@fia.org
+            Expire-Date: 0
+            EOF
+          git config --global user.signingkey $(gpg --list-secret-keys --keyid-format=long jh.ewers@gmail.com | grep 'sec' | awk 'match($0, /[0-9A-Z]{16}/) {print substr($0, RSTART, RLENGTH)}')
+
       - name: Create test environment
         run: |
           cd ..
@@ -47,9 +63,6 @@ jobs:
           cd git-release-test
           git remote rm origin
           cd ../git-release
-          git config --global user.email "djchentulmen@fia.org"
-          git config --global user.name "Niki Lauda"
-          git config --global commit.gpgsign false
           git remote rename origin origin-renamed
           git remote add origin ../git-release-test
 
@@ -62,4 +75,4 @@ jobs:
         run: sudo make install
 
       - name: Run git-release
-        run:  git release v90.90.90 --no-sign
+        run:  git release v90.90.90
