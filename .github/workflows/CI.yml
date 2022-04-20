@@ -14,12 +14,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
-
-      - uses: actions-rs/install@v0.1
-        with:
-          crate: git-cliff
-          version: ${{ matrix.cliffversion }}
-          use-tool-cache: true
+      
+      - name: Install dependencies
+        run: cargo install --version ${{ matrix.cliffversion }} git-cliff
 
       - name: Create test environment
         run: |
