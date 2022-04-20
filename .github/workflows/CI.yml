@@ -14,9 +14,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Install dependencies
-        run: cargo install --version ${{ matrix.cliffversion }} git-cliff
+        run: |
+          if [[ "${{ matrix.cliffversion }}" == "latest" ]]; then
+            cargo install git-cliff
+          else
+            cargo install --version ${{ matrix.cliffversion }} git-cliff
+          fi
 
       - name: Create test environment
         run: |
