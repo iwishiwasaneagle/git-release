@@ -29,7 +29,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             ~/.cargo/bin
-          key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-cargo-cliff-${{ matrix.cliffversion}}
+          key: ${{ matrix.os }}-${{ steps.get-date.outputs.date }}-cargo-cliff-${{ matrix.cliffversion}}
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
