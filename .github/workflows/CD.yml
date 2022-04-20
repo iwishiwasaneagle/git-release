@@ -69,7 +69,7 @@ jobs:
 
   publish:
     name: Publish to GitHub
-    needs: [generate-changelog,build-python,setup-envs]
+    needs: [generate-changelog,setup-envs]
     runs-on: ubuntu-20.04
 
     steps:
