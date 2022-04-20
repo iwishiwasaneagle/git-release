@@ -15,24 +15,24 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Get Date
-        id: get-date
-        run: |
-          echo "::set-output name=date::$(/bin/date -u "+%Y%W")"
-        shell: bash
-
-      - name: Setup cache
-        id: cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            ~/.cargo/bin
-          key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-cargo-cliff-${{ matrix.cliffversion}}
+        #      - name: Get Date
+        #        id: get-date
+        #        run: |
+        #          echo "::set-output name=date::$(/bin/date -u "+%Y%W")"
+        #        shell: bash
+        #
+        #      - name: Setup cache
+        #        id: cache
+        #        uses: actions/cache@v2
+        #        with:
+        #          path: |
+        #            ~/.cargo/registry
+        #            ~/.cargo/git
+        #            ~/.cargo/bin
+        #          key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-cargo-cliff-${{ matrix.cliffversion}}
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
+        # if: steps.cache.outputs.cache-hit != 'true'
         run: |
           if [[ "${{ matrix.cliffversion }}" == "latest" ]]; then
             cargo install git-cliff
