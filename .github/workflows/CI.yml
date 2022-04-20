@@ -49,6 +49,7 @@ jobs:
           cd ../git-release
           git config --global user.email "djchentulmen@fia.org"
           git config --global user.name "Niki Lauda"
+          git config --global commit.gpgsign false
           git remote rename origin origin-renamed
           git remote add origin ../git-release-test
 
