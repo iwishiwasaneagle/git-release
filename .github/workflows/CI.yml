@@ -41,18 +41,10 @@ jobs:
           fi
 
       - name: Setup git user with signing
-        run: |
-          gpg --batch --gen-key <<-END
-            %no-protection
-            Key-Type: 1
-            Key-Length: 2048
-            Subkey-Type: 1
-            Subkey-Length: 2048
-            Name-Real: Niki Lauda
-            Name-Email: djchentulmen@fia.org
-            Expire-Date: 0
-          END
-          git config --global user.signingkey $(gpg --list-secret-keys --keyid-format=long djchentulmen@fia.org | grep 'sec' | awk 'match($0, /[0-9A-Z]{16}/) {print substr($0, RSTART, RLENGTH)}')
+        uses: iwishiwasaneagle/git-user-random-gpg@v1
+        with:
+          email: djchentulmen@fia.org
+          name: Niki Lauda
 
       - name: Create test environment
         run: |
