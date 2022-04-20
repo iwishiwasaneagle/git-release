@@ -76,12 +76,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Select files to be uploaded for the release
+        run: |
+          mkdir release
+          cp -t release CHANGELOG.md git-release.sh Makefile
+
       - name: Upload the release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref }}
-          file: ./*
+          file: release/**
           file_glob: true
           release_name: "Release ${{needs.setup-envs.outputs.version}}"
           body: "${{ needs.generate-changelog.outputs.release_body }}"
