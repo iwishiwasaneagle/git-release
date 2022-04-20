@@ -65,13 +65,15 @@ git commit "$CHANGELOG_FILE" -m "chore(release): prepare for $1 $SKIP_CLI"
 git show
 
 # generate a changelog for the tag message based on the following template
-export TEMPLATE="\
-{% for group, commits in commits | group_by(attribute=\"group\") %}
-{{ group | upper_first }}\
+export TEMPLATE=$(cat <<END
+{% for group, commits in commits | group_by(attribute="group") %}
+{{ group | upper_first }}
 {% for commit in commits %}
-	- {{ commit.message | upper_first }} ({{ commit.id | truncate(length=7, end=\"\") }})\
+- {{ commit.message | upper_first }} ({{ commit.id | truncate(length=7, end="") }})
 {% endfor %}
 {% endfor %}"
+END
+)
 
 if [[ -z "$MESSAGE" ]]; then
     MESSAGE=$(git-cliff --unreleased --strip all)
