@@ -36,6 +36,7 @@ jobs:
             echo "ERROR:<->Unable to validate package version: '$VERSION'"
             exit 1
           fi
+
   generate-changelog:
     name: Generate changelog
     needs: setup-envs
