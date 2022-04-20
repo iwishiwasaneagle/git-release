@@ -4,19 +4,25 @@ set -e
 
 function usage() {
     cat<<HELPUSAGE
-git release [options] [<commit>...]
+git release [options] <tagname>
 
-    Options:
-        --force  Force
-        -r       Re-fetch"
-        -m MSG   Merge commit message
-        -u       Allow unrelated history
+Options
+        --verify       Run git hooks. Default skips. WARNING: Tags and that may need to be deleted if a hook is run and it fails the push/tag creation/commit/etc.
+        --skip-cli     Add a message to the commit to skip the pre-commit ci (only relevant if you are using pre-commit ci
+
+Tag options
+        -m, --message <message>   Tag message (defaults to changelog)
+        -s                        Sign the tag
+
 HELPUSAGE
 }
 
-UNRELATED_HIST=""
 MESSAGE=""
-TEMP=$(getopt -n release --long force,message:,unrelated,re-fetch -o ufrm: -- "$@")
+SKIP_CLI=""
+SIGN=""
+NOVERIFY="--no-verify"
+
+TEMP=$(getopt -n release --long verify,skip-cli,message: -o sm: -- "$@")
 eval set -- "$TEMP"
 
 while true; do
@@ -25,37 +31,53 @@ while true; do
             usage
             exit 0
             ;;
-        -u | --unrelated )
-            UNRELATED_HIST='--allow-unrelated-histories'
-            shift;
-            ;;
         -m | --message )
-            MESSAGE="-m '$2'"
+            MESSAGE="$2"
             shift 2;
             ;;
-        -r | --re-fetch )
-            echo "Re-fetching updates"
-            git fetch -q
-            shift;
+        --skip-cli )
+            SKIP_CLI="[skip pre-commit.ci]"
+            shift 1;
             ;;
-        -f | --force)
-            echo "WARNING: Force enabled"
-            FORCE="--overwrite-ignore"
-            shift;
+        -s )
+            SIGN="-s"
+            shift 1;
+            ;;
+        --verify )
+            NOVERIFY="";
+            shift 1;
             ;;
         -- ) shift; break ;;
         * ) break ;;
     esac
 done
 
-BRANCH=${@:$OPTIND:1}
-
-if [ -z "$BRANCH" ]; then
-    echo "No branch was specified." >&2;
-    echo ""
-    usage
-    exit 0;
+if command -v pre-commit &> /dev/null; then
+    pre-commit uninstall
 fi
 
-git merge --squash $FORCE $UNRELATED_HIST $BRANCH
-git commit $MESSAGE
+git-cliff --tag "$1" > CHANGELOG.md
+git commit CHANGELOG.md -m "chore(release): prepare for $1 $SKIP_CLI"
+git show
+
+# generate a changelog for the tag message based on the following template
+export TEMPLATE="\
+{% for group, commits in commits | group_by(attribute=\"group\") %}
+{{ group | upper_first }}\
+{% for commit in commits %}
+	- {{ commit.message | upper_first }} ({{ commit.id | truncate(length=7, end=\"\") }})\
+{% endfor %}
+{% endfor %}"
+
+if [[ -z "$MESSAGE" ]]; then
+    MESSAGE=$(git-cliff --unreleased --strip all)
+fi
+# create a signed tag
+# https://keyserver.ubuntu.com/pks/lookup?search=0x4A92FA17B6619297&op=vindex
+git tag "$SIGN" -a "$1" -m "Release $1" -m "$MESSAGE"
+git tag -v "$1"
+git push "$NOVERIFY" origin $(git branch --show-current) "$1"
+
+if command -v pre-commit &> /dev/null; then
+    pre-commit install
+fi
