@@ -3,6 +3,8 @@
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/iwishiwasaneagle/git-release/master.svg)](https://results.pre-commit.ci/latest/github/iwishiwasaneagle/git-release/master)
 [![CI](https://github.com/iwishiwasaneagle/git-release/actions/workflows/CI.yml/badge.svg)](https://github.com/iwishiwasaneagle/git-release/actions/workflows/CI.yml)
 [![License](https://img.shields.io/github/license/iwishiwasaneagle/git-release)](https://github.com/iwishiwasaneagle/git-release/blob/master/LICENSE.txt)
+![OS: Linux](https://img.shields.io/badge/Supported%20OS-Linux,%20Mac-informational)
+
 
 Easily generate releases using [`git-cliff`](https://github.com/orhun/git-cliff) and [github actions](https://github.com/iwishiwasaneagle/git-release/blob/master/.github/workflows/CD.yml)
 
