@@ -9,6 +9,7 @@ git release [options] <tagname>
 Options
     --verify       Run git hooks. Default skips. WARNING: Tags and that may need to be deleted if a hook is run and it fails the push/tag creation/commit/etc.
     --no-skip-ci   Don't add a message to the commit to skip the pre-commit ci (only relevant if you are using pre-commit ci)
+    --no-semver    Don't check if the tag is semver compatible (i.e. v9.2.3)
 
 Tag options
     -m, --message <message>   Tag message (defaults to changelog)
@@ -21,8 +22,9 @@ MESSAGE=""
 SKIP_CI="[skip pre-commit.ci]"
 SIGN="-s"
 NOVERIFY="--no-verify"
+SEMVERCHECK=1
 
-TEMP=$(getopt -n release --long help,verify,no-sign,skip-ci,message: -o hm: -- "$@")
+TEMP=$(getopt -n release --long no-semver,help,verify,no-sign,skip-ci,message: -o hm: -- "$@")
 eval set -- "$TEMP"
 
 while true; do
@@ -30,6 +32,10 @@ while true; do
         -h|--help)
             usage
             exit 0
+            ;;
+        --no-semver)
+            SEMVERCHECK=0
+            shift 1;
             ;;
         -m | --message )
             MESSAGE="$2"
@@ -52,6 +58,15 @@ while true; do
     esac
 done
 
+set +e
+SEMVERCOUNTS=$(echo $1 | grep -oPc "^v?(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$")
+set -e
+echo $SEMVERCOUNTS
+if [[ $SEMVERCHECK -eq 1 && $SEMVERCOUNTS -ne 1 ]]; then
+    echo "Invalid semantic version \"$1\". Use --no-semver if you would like to use it regardless"
+    exit 1
+fi
+exit 2
 if command -v pre-commit &> /dev/null; then
     pre-commit uninstall
 fi
