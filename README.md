@@ -11,8 +11,10 @@ Easily generate tag-based releases using [`git-cliff`](https://github.com/orhun/
 ## Installation
 
 ```bash
+# Install dependencies
 cargo install git-cliff
 
+# Install git-release
 sudo make install
 ```
 
