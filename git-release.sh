@@ -66,7 +66,7 @@ if [[ $SEMVERCHECK -eq 1 && $SEMVERCOUNTS -ne 1 ]]; then
     echo "Invalid semantic version \"$1\". Use --no-semver if you would like to use it regardless"
     exit 1
 fi
-exit 2
+
 if command -v pre-commit &> /dev/null; then
     pre-commit uninstall
 fi
