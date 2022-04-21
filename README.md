@@ -6,7 +6,7 @@
 ![OS: Linux](https://img.shields.io/badge/Supported%20OS-Linux,%20Mac-informational)
 
 
-Easily generate releases using [`git-cliff`](https://github.com/orhun/git-cliff) and [github actions](https://github.com/iwishiwasaneagle/git-release/blob/master/.github/workflows/CD.yml)
+Easily generate tag-based releases using [`git-cliff`](https://github.com/orhun/git-cliff). These can then be leveraged via [github actions](https://github.com/iwishiwasaneagle/git-release/blob/master/.github/workflows/CD.yml)
 
 ## Installation
 
