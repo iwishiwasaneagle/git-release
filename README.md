@@ -32,6 +32,16 @@ Tag options
     --no-sign                 Don't sign the tag
 ```
 
+## Contributing
+
+Ensure that `pre-commit` is installed and working. Otherwise the pre-commit CI will most likely fail.
+
+```bash
+# Install and setup pre-commit
+pip install pre-commit
+pre-commit install --install-hooks
+```
+
 ## Example
 
 Installing `git-release` and using it  to create [v0.0.1](https://github.com/iwishiwasaneagle/git-release/releases/tag/v0.0.1):
