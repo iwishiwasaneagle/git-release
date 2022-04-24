@@ -34,6 +34,10 @@ def setup_ap() -> ap.ArgumentParser:  # pragma: no cover
         help="The repository remote (" "defaults to 'origin')",
     )
 
+    parser.add_argument(
+        "-v", "--verbose", action="count", default=0, help="NOT IMPLEMENTED YET"
+    )
+
     # -- SemVer --- #
     semver_behaviour = parser.add_argument_group(
         "Semantic Version",
@@ -108,12 +112,15 @@ def main():  # pragma: no cover
         )
 
     git_cliff_bin = find_git_cliff()
-    changelog = generate_git_cliff_changelog(semver, git_cliff_bin)
-    write_and_commit_changelog(changelog, semver)
-    message = generate_git_cliff_message(git_cliff_bin)
+
+    if args.comment:
+        message = args.comment
+    else:
+        changelog = generate_git_cliff_changelog(semver, git_cliff_bin)
+        write_and_commit_changelog(changelog, semver)
+        message = generate_git_cliff_message(git_cliff_bin)
 
     create_tag(semver, message)
-
     push_to_remote(semver, args.remote)
 
 
@@ -226,8 +233,8 @@ def get_current_repo_version(path: pathlib.Path = None):
     repo = get_repo(path)
     if repo.is_dirty():
         logger.warning(
-            "This repo has unstaged changes. Git-release needs to be run in"
-            "a up-to-date one in order to be effective. Please stage your"
+            "This repo has unstaged changes. Git-release needs to be run in "
+            "a up-to-date one in order to be effective. Please stage your "
             "changes and re-run."
         )
 
