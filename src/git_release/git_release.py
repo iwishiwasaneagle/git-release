@@ -205,7 +205,8 @@ def push_to_remote(tag: SemVer, remote: str = "origin", path: pathlib.Path = Non
     repo = get_repo(path)
 
     origin = repo.remotes[remote]
-    origin.push([repo.active_branch, semver_dataclass_to_string(tag)])
+    origin.push([str(repo.active_branch)]).raise_if_error()
+    origin.push([semver_dataclass_to_string(tag)]).raise_if_error()
 
 
 def get_current_repo_version(path: pathlib.Path = None):
