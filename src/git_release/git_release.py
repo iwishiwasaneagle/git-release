@@ -8,15 +8,15 @@ import string
 import subprocess
 import tempfile
 from typing import Optional, Union
-
+from importlib.metadata import version
 import git
 import pathlib
 from loguru import logger
 
 
 def setup_ap() -> ap.ArgumentParser:  # pragma: no cover
-    parser = ap.ArgumentParser("git-release")
-
+    parser = ap.ArgumentParser(prog="git-release")
+    parser.add_argument('--version', action='version', version=f'%(prog)s {version(__name__)}')
     parser.add_argument(
         "--comment",
         "-c",
@@ -41,12 +41,12 @@ def setup_ap() -> ap.ArgumentParser:  # pragma: no cover
     # -- SemVer --- #
     semver_behaviour = parser.add_argument_group(
         "Semantic Version",
-        description="Options to manipulate the version. If --version is not passed, "
+        description="Options to manipulate the version. If --semver is not passed, "
         "git-release uses the most recent tag.",
     )
 
     semver_behaviour.add_argument(
-        "--version",
+        "--semver",
         type=validate_semver,
         default=get_current_repo_version(),
         help="Custom semantic version. Use --no-inc to use as is.",
@@ -87,6 +87,7 @@ def setup_ap() -> ap.ArgumentParser:  # pragma: no cover
 
 
 def main():  # pragma: no cover
+    logger.trace("Start of main")
     parser = setup_ap()
     args = parser.parse_args()
 
@@ -97,7 +98,7 @@ def main():  # pragma: no cover
         )
         exit(1)
 
-    semver = args.version
+    semver = args.semver
     if not args.no_inc:
         if args.inc_major:
             semver = increment_major_semver_by_one(semver)
@@ -122,6 +123,7 @@ def main():  # pragma: no cover
 
     create_tag(semver, message)
     push_to_remote(semver, args.remote)
+    logger.trace("End of main")
 
 
 @dataclasses.dataclass
