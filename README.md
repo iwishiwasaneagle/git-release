@@ -6,14 +6,40 @@
 ![OS: Linux](https://img.shields.io/badge/Supported%20OS-Linux,%20Mac-informational)
 
 
-Easily generate releases using [`git-cliff`](https://github.com/orhun/git-cliff) and [github actions](https://github.com/iwishiwasaneagle/git-release/blob/master/.github/workflows/CD.yml)
+Easily generate tag-based releases using [`git-cliff`](https://github.com/orhun/git-cliff). These can then be leveraged via [github actions](https://github.com/iwishiwasaneagle/git-release/blob/master/.github/workflows/CD.yml)
 
 ## Installation
 
 ```bash
+# Install dependencies
 cargo install git-cliff
 
+# Install git-release
 sudo make install
+```
+
+## Usage
+
+```txt
+git release [options] <tagname>
+
+Options
+    --verify       Run git hooks. Default skips. WARNING: Tags and that may need to be deleted if a hook is run and it fails the push/tag creation/commit/etc.
+    --no-skip-ci   Don't add a message to the commit to skip the pre-commit ci (only relevant if you are using pre-commit ci)
+
+Tag options
+    -m, --message <message>   Tag message (defaults to changelog)
+    --no-sign                 Don't sign the tag
+```
+
+## Contributing
+
+Ensure that `pre-commit` is installed and working. Otherwise the pre-commit CI will most likely fail.
+
+```bash
+# Install and setup pre-commit
+pip install pre-commit
+pre-commit install --install-hooks
 ```
 
 ## Example
