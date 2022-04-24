@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.4] - 2022-04-24
+
+### Miscellaneous Tasks
+
+- Add logging
+
+## [0.0.3] - 2022-04-24
+
+### Miscellaneous Tasks
+
+- Update changelog [skip pre-commit.ci]
+
 ## [0.0.2] - 2022-04-24
 
 ### Bug Fixes
