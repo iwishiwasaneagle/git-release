@@ -1,13 +1,38 @@
 import dataclasses
+import os
+import random
 import re
 import argparse as ap
-import warnings
+import distutils.spawn
+import string
+import subprocess
+import tempfile
+from typing import Optional, Union
+
 import git
 import pathlib
+from loguru import logger
 
 
 def setup_ap() -> ap.ArgumentParser:  # pragma: no cover
     parser = ap.ArgumentParser("git-release")
+
+    parser.add_argument(
+        "--comment",
+        "-c",
+        type=str,
+        help="A comment to describe the release. "
+        "Synonymous to a tag message. Defaults "
+        "to the generated changelog.",
+    )
+
+    parser.add_argument(
+        "--remote",
+        "-r",
+        type=str,
+        default="origin",
+        help="The repository remote (" "defaults to 'origin')",
+    )
 
     # -- SemVer --- #
     semver_behaviour = parser.add_argument_group(
@@ -19,7 +44,7 @@ def setup_ap() -> ap.ArgumentParser:  # pragma: no cover
     semver_behaviour.add_argument(
         "--version",
         type=validate_semver,
-        default=get_scm(),
+        default=get_current_repo_version(),
         help="Custom semantic version. Use --no-inc to use as is.",
     )
 
@@ -61,6 +86,13 @@ def main():  # pragma: no cover
     parser = setup_ap()
     args = parser.parse_args()
 
+    if not args.comment and find_git_cliff() is None:
+        logger.critical(
+            f"--comment was not set, and git-cliff cannot be found within $PATH."
+            f" Either install git-cliff or add a comment when rerunning."
+        )
+        exit(1)
+
     semver = args.version
     print(args)
     if not args.no_inc:
@@ -71,11 +103,19 @@ def main():  # pragma: no cover
         elif args.inc_patch:
             semver = increment_patch_semver_by_one(semver)
     else:
-        warnings.warn(
+        logger.warning(
             f"You have chosen not to increment the semantic version. This "
             f"may cause errors within Git"
         )
-    print(semver_dataclass_to_string(semver))
+
+    git_cliff_bin = find_git_cliff()
+    changelog = generate_git_cliff_changelog(semver, git_cliff_bin)
+    write_and_commit_changelog(changelog)
+    message = generate_git_cliff_message(git_cliff_bin)
+
+    create_tag(semver, message)
+
+    push_to_remote(semver, args.remote)
 
 
 @dataclasses.dataclass
@@ -109,15 +149,73 @@ class SemVer:
         return semver_dataclass_to_string(self)
 
 
-def get_current_repo_version(path: pathlib.Path = None):
-    repo = git.Repo(
-        path if path is not None else pathlib.Path.cwd(), search_parent_directories=True
+def find_git_cliff(path: Optional[pathlib.Path] = None) -> Optional[pathlib.Path]:
+    ex_path = distutils.spawn.find_executable("git-cliff", path)
+    if ex_path is None:
+        return None
+    return pathlib.Path(ex_path)
+
+
+def generate_git_cliff_changelog(tag: SemVer, executable: pathlib.Path) -> str:
+    changelog = subprocess.run(
+        [str(executable), "--tag", semver_dataclass_to_string(tag)], capture_output=True
+    ).stdout.decode("utf-8")
+    return changelog
+
+
+def get_repo(path: Optional[pathlib.Path] = None) -> git.repo:
+    try:
+        repo = git.Repo(
+            path if path is not None else pathlib.Path.cwd(),
+            search_parent_directories=True,
+        )
+        return repo
+    except git.exc.InvalidGitRepositoryError as e:
+        logger.critical("git-release was run outwith a valid git repository")
+        exit(1)
+
+
+def write_and_commit_changelog(changelog: str, path: Optional[pathlib.Path] = None):
+    repo = get_repo(path)
+
+    with open("CHANGELOG.md", "w") as f:
+        f.write(changelog)
+
+    repo.index.add(["CHANGELOG.md"])
+    repo.index.write()
+    repo.git.commit(
+        "-S", "-m", f"chore(release): update changelog [skip pre-commit.ci]"
     )
 
-    # if repo.is_dirty():
-    #     raise Exception("This repo has unstaged changes. Git-release needs to be run in"
-    #                     "a up-to-date one in order to be effective. Please stage your"
-    #                     "changes and re-run.")
+
+def generate_git_cliff_message(executable: pathlib.Path) -> str:
+    message = subprocess.run(
+        [str(executable), "--unreleased", "--strip", "all"], capture_output=True
+    ).stdout.decode("utf-8")
+    return message
+
+
+def create_tag(tag: SemVer, message: str, path: pathlib.Path = None) -> None:
+    repo = get_repo(path)
+
+    repo.create_tag(semver_dataclass_to_string(tag), message=message)
+
+
+def push_to_remote(tag: SemVer, remote: str = "origin", path: pathlib.Path = None):
+    repo = get_repo(path)
+
+    origin = repo.remotes[remote]
+    origin.push([repo.active_branch, semver_dataclass_to_string(tag)])
+
+
+def get_current_repo_version(path: pathlib.Path = None):
+    repo = get_repo(path)
+    if repo.is_dirty():
+        logger.warning(
+            "This repo has unstaged changes. Git-release needs to be run in"
+            "a up-to-date one in order to be effective. Please stage your"
+            "changes and re-run."
+        )
 
     tags = repo.tags
     semver_list = []
@@ -128,8 +226,8 @@ def get_current_repo_version(path: pathlib.Path = None):
             pass
 
     if len(semver_list) == 0:
-        warnings.warn(
-            "No valid semver tags were found in this repo. Running with"
+        logger.warning(
+            "No valid semver tags were found in this repo. Running with "
             "v0.0.0 and following increment procedure."
         )
         return SemVer(0, 0, 0)

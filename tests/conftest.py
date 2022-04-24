@@ -13,6 +13,7 @@ def semver(request):
 
     yield SemVer(major, minor, patch)
 
+
 @pytest.fixture
 def actor():
     git_actor = git.Actor("pytest-actor", "pytest@actor.com")
@@ -22,14 +23,18 @@ def actor():
 @pytest.fixture
 def repo(request, tmpdir, semver, actor):
     if hasattr(request, "param"):
-        tags = request.param['tags']
+        tags = request.param["tags"]
     else:
         tags = [str(semver)]
 
     tmprepo = git.Repo.init(tmpdir)
 
     for f in tags:
-        tmprepo.index.commit(f"empty commit to enable a tag with name {f}", author=actor)
+        tmprepo.index.commit(
+            f"empty commit to enable a tag with name {f}", author=actor
+        )
         tmprepo.create_tag(f, message="Test tag created by pytest")
+
+    setattr(tmprepo, "_tag", semver)
 
     yield tmprepo
