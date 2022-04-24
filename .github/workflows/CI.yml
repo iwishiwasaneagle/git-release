@@ -65,8 +65,8 @@ jobs:
           git add seq.txt
           git commit seq.txt -m "feat: test-data"
 
-      - name: Install git-release
+      - name: Install git_release
         run: sudo make install
 
-      - name: Run git-release
+      - name: Run git_release
         run:  git release v90.90.90
