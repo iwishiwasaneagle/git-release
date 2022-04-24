@@ -109,7 +109,7 @@ def main():  # pragma: no cover
 
     git_cliff_bin = find_git_cliff()
     changelog = generate_git_cliff_changelog(semver, git_cliff_bin)
-    write_and_commit_changelog(changelog)
+    write_and_commit_changelog(changelog, semver)
     message = generate_git_cliff_message(git_cliff_bin)
 
     create_tag(semver, message)
@@ -164,7 +164,10 @@ def generate_git_cliff_changelog(tag: SemVer, executable: pathlib.Path) -> str:
     ).stdout.decode("utf-8")
     return changelog
 
+
 __print_once = True
+
+
 def get_repo(path: Optional[pathlib.Path] = None) -> git.repo:
     try:
         repo = git.Repo(
@@ -172,7 +175,7 @@ def get_repo(path: Optional[pathlib.Path] = None) -> git.repo:
             search_parent_directories=True,
         )
         global __print_once
-        if (__print_once:=False):
+        if __print_once := False:
             logger.debug(f"Repo found at {repo.working_tree_dir}")
         return repo
     except git.exc.InvalidGitRepositoryError as e:
@@ -180,7 +183,9 @@ def get_repo(path: Optional[pathlib.Path] = None) -> git.repo:
         exit(1)
 
 
-def write_and_commit_changelog(changelog: str, path: Optional[pathlib.Path] = None):
+def write_and_commit_changelog(
+    changelog: str, tag: SemVer, path: Optional[pathlib.Path] = None
+):
     logger.debug("Writing changelog to CHANGELOG.md and committing")
     repo = get_repo(path)
 
@@ -190,7 +195,7 @@ def write_and_commit_changelog(changelog: str, path: Optional[pathlib.Path] = No
     repo.index.add(["CHANGELOG.md"])
     repo.index.write()
     repo.git.commit(
-        "-S", "-m", f"chore(release): update changelog [skip pre-commit.ci]"
+        "-S", "-m", f"chore(release): update changelog for {tag} [skip pre-commit.ci]"
     )
 
 
