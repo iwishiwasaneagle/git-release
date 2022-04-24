@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 - Add logging
 - Update changelog [skip pre-commit.ci]
 - Update changelog [skip pre-commit.ci]
+- Update changelog [skip pre-commit.ci]
+- More information in changelog commit
 
 ## [0.0.3] - 2022-04-24
 
