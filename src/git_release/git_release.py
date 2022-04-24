@@ -152,23 +152,29 @@ class SemVer:
 def find_git_cliff(path: Optional[pathlib.Path] = None) -> Optional[pathlib.Path]:
     ex_path = distutils.spawn.find_executable("git-cliff", path)
     if ex_path is None:
+        logger.error("Unable to find git-cliff binary. Is it even installed?")
         return None
+    logger.debug(f"Found git-cliff binary at {ex_path}")
     return pathlib.Path(ex_path)
 
 
 def generate_git_cliff_changelog(tag: SemVer, executable: pathlib.Path) -> str:
+    logger.debug(f"Generating git-cliff changelog")
     changelog = subprocess.run(
         [str(executable), "--tag", semver_dataclass_to_string(tag)], capture_output=True
     ).stdout.decode("utf-8")
     return changelog
 
-
+__print_once = True
 def get_repo(path: Optional[pathlib.Path] = None) -> git.repo:
     try:
         repo = git.Repo(
             path if path is not None else pathlib.Path.cwd(),
             search_parent_directories=True,
         )
+        global __print_once
+        if (__print_once:=False):
+            logger.debug(f"Repo found at {repo.working_tree_dir}")
         return repo
     except git.exc.InvalidGitRepositoryError as e:
         logger.critical("git-release was run outwith a valid git repository")
@@ -176,6 +182,7 @@ def get_repo(path: Optional[pathlib.Path] = None) -> git.repo:
 
 
 def write_and_commit_changelog(changelog: str, path: Optional[pathlib.Path] = None):
+    logger.debug("Writing changelog to CHANGELOG.md and committing")
     repo = get_repo(path)
 
     with open("CHANGELOG.md", "w") as f:
@@ -189,6 +196,7 @@ def write_and_commit_changelog(changelog: str, path: Optional[pathlib.Path] = No
 
 
 def generate_git_cliff_message(executable: pathlib.Path) -> str:
+    logger.debug(f"Generating git-cliff message")
     message = subprocess.run(
         [str(executable), "--unreleased", "--strip", "all"], capture_output=True
     ).stdout.decode("utf-8")
@@ -203,6 +211,7 @@ def create_tag(tag: SemVer, message: str, path: pathlib.Path = None) -> None:
 
 def push_to_remote(tag: SemVer, remote: str = "origin", path: pathlib.Path = None):
     repo = get_repo(path)
+    logger.info(f"Pushing tag {tag} and branch {repo.active_branch} to {remote}")
 
     origin = repo.remotes[remote]
     origin.push([str(repo.active_branch)]).raise_if_error()
@@ -232,7 +241,9 @@ def get_current_repo_version(path: pathlib.Path = None):
             "v0.0.0 and following increment procedure."
         )
         return SemVer(0, 0, 0)
-    return max(semver_list)
+    max_tag = max(semver_list)
+    logger.debug(f"Found highest semantic version: {max_tag}")
+    return max_tag
 
 
 def validate_semver(tocheck: str) -> SemVer:
