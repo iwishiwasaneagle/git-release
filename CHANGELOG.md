@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 
 - Example usage
 - Add supported os
+- Add section on contributing
 
 ### Features
 
@@ -24,6 +25,7 @@ All notable changes to this project will be documented in this file.
 ### Miscellaneous Tasks
 
 - Python gitignore
+- Update changelog [skip pre-commit.ci]
 
 ### Testing
 
