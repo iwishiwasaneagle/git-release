@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.5] - 2022-04-24
+
+### Bug Fixes
+
+- Show version from CLI
+- Remove version from CLI and rely on dynamic fetch
+- Scratch showing version at runtime for now
+
+### Features
+
+- --comment flag
+- Moved to python
+- Automated versioning
+
 ## [0.0.4] - 2022-04-24
 
 ### Miscellaneous Tasks
@@ -11,6 +25,7 @@ All notable changes to this project will be documented in this file.
 - Update changelog [skip pre-commit.ci]
 - Update changelog [skip pre-commit.ci]
 - More information in changelog commit
+- Update changelog for v0.0.4 [skip pre-commit.ci]
 
 ## [0.0.3] - 2022-04-24
 
