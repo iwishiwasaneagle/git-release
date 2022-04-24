@@ -8,7 +8,6 @@ import string
 import subprocess
 import tempfile
 from typing import Optional, Union
-from importlib.metadata import version
 import git
 import pathlib
 from loguru import logger
@@ -16,7 +15,6 @@ from loguru import logger
 
 def setup_ap() -> ap.ArgumentParser:  # pragma: no cover
     parser = ap.ArgumentParser(prog="git-release")
-    parser.add_argument('--version', action='version', version=f'%(prog)s {version(__name__)}')
     parser.add_argument(
         "--comment",
         "-c",
