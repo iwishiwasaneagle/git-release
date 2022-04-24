@@ -94,7 +94,6 @@ def main():  # pragma: no cover
         exit(1)
 
     semver = args.version
-    print(args)
     if not args.no_inc:
         if args.inc_major:
             semver = increment_major_semver_by_one(semver)
