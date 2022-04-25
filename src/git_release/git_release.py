@@ -202,7 +202,8 @@ def write_and_commit_changelog(
     repo.index.add(["CHANGELOG.md"])
     repo.index.write()
     repo.git.commit(
-        "-S", "-m", f"chore(release): update changelog for {tag} [skip pre-commit.ci]"
+        "-S", "-m", f"chore(release): update changelog for {tag} [skip pre-commit.ci]",
+        "--no-verify"
     )
 
 
@@ -225,8 +226,8 @@ def push_to_remote(tag: SemVer, remote: str = "origin", path: pathlib.Path = Non
     logger.info(f"Pushing tag {tag} and branch {repo.active_branch} to {remote}")
 
     origin = repo.remotes[remote]
-    origin.push([str(repo.active_branch)]).raise_if_error()
-    origin.push([semver_dataclass_to_string(tag)]).raise_if_error()
+    origin.push([str(repo.active_branch)],no_verify=True).raise_if_error()
+    origin.push([semver_dataclass_to_string(tag)],no_verify=True).raise_if_error()
 
 
 def get_current_repo_version(path: pathlib.Path = None):
