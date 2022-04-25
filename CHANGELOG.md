@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.9] - 2022-04-25
+
+### Miscellaneous Tasks
+
+- Update changelog for v0.0.8 [skip pre-commit.ci]
+
 ## [0.0.7] - 2022-04-25
 
 ### Miscellaneous Tasks
