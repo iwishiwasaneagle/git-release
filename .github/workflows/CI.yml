@@ -15,6 +15,13 @@ jobs:
         python-version: ["3.8", "3.9"]
     steps:
     - uses: actions/checkout@v3
+    - uses: iwishiwasaneagle/git-user-random-gpg@v1
+      with:
+        email: tester@testing.com
+        name:  tester
+    - run: |
+        git config --global user.email "tester@testing.com"
+        git config --global user.name  "tester"
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
