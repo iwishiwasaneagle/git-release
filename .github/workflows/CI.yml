@@ -28,6 +28,10 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements.txt -r tests/requirements.txt
 
+    - name: set pythonpath
+      run: |
+          echo "PYTHONPATH=src/" >> $GITHUB_ENV
+
     # Don't use tox as caching does not work reliably. Maybe re-visit this in the future.
     - name: Run tests
       run: |
