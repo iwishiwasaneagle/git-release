@@ -1,72 +1,41 @@
 name: CI
 
 on:
-  workflow_dispatch:
-  push:
-  pull_request:
+    push:
+        branches: [master, dev]
+    pull_request:
+    workflow_dispatch:
 
 jobs:
-  CI:
+  run-tests:
+    runs-on: ${{matrix.platform}}
     strategy:
       matrix:
-        os: [ubuntu-latest, ubuntu-20.04, ubuntu-18.04, macos-latest]
-        cliffversion : [latest, "0.6.1"]
-    runs-on: ${{ matrix.os }}
+        platform: [ubuntu-latest]
+        python-version: ["3.8", "3.9"]
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-      - name: Get Date
-        id: get-date
-        run: |
-          echo "::set-output name=date::$(/bin/date -u "+%Y%W")"
-        shell: bash
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        cache: "pip"
+        python-version: ${{ matrix.python-version }}
+        cache-dependency-path: |
+            requirements.txt
+            tests/requirements.txt
 
-      - name: Setup cache
-        id: cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            ~/.cargo/bin
-          key: ${{ matrix.os }}-${{ steps.get-date.outputs.date }}-cargo-cliff-${{ matrix.cliffversion}}
+    - name: Install dependencies
+      run: pip install -r requirements.txt -r tests/requirements.txt
 
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          if [[ "${{ matrix.cliffversion }}" == "latest" ]]; then
-            cargo install git-cliff
-          else
-            cargo install --version ${{ matrix.cliffversion }} git-cliff
-          fi
+    # Don't use tox as caching does not work reliably. Maybe re-visit this in the future.
+    - name: Run tests
+      run: |
+        grep 'test: pytest' tox.ini | sed 's/{posargs} //g' | awk -F':' '{print $2}' | bash
 
-      - name: Setup git user with signing
-        uses: iwishiwasaneagle/git-user-random-gpg@v1
-        with:
-          email: djchentulmen@fia.org
-          name: Niki Lauda
-
-      - name: Create test environment
-        run: |
-          git config --global user.email "djchentulmen@fia.org"
-          git config --global user.name "Niki Lauda"
-
-          cd ..
-          git clone git-release/ git-release-test
-          cd git-release-test
-          git remote rm origin
-
-          cd ../git-release
-          git remote rename origin origin-renamed
-          git remote add origin ../git-release-test
-
-          git switch -c rawe-ceek
-          seq 100 > seq.txt
-          git add seq.txt
-          git commit seq.txt -m "feat: test-data"
-
-      - name: Install git_release
-        run: sudo make install
-
-      - name: Run git_release
-        run:  git release v90.90.90
+    - uses: codecov/codecov-action@v2.1.0
+      if: ${{ github.actor != 'dependabot[bot]' }}
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: coverage.xml
+        fail_ci_if_error: true

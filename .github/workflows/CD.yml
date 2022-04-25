@@ -25,6 +25,7 @@ jobs:
           v=${GITHUB_REF##*/}
           echo "Version: $v"
           echo "::set-output name=version::$v"
+
       - name: Check version
         shell: bash
         run: |
@@ -48,45 +49,70 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Generate latest changelog
-        uses: orhun/git-cliff-action@v1
-        id: git-cliff-latest
-        with:
-          args: -vv --latest --strip header
-        env:
-          OUTPUT: CHANGELOG.md
 
       - name: Set the release body
         id: release
         shell: bash
         run: |
-          r=$(cat ${{ steps.git-cliff.outputs.changelog }})
+          r=$(cat CHANGELOG.md)
           r="$(printf "$r" | tail -n +3)"
           r="${r//'%'/'%25'}"
           r="${r//$'\n'/'%0A'}"
           r="${r//$'\r'/'%0D'}"
           echo "::set-output name=release_body::$r"
 
+  build-python:
+    name: Build python
+    needs: setup-envs
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          pip install tox
+
+      - name: Build with tox
+        run: tox -e build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist/
+
   publish:
-    name: Publish to GitHub
-    needs: [generate-changelog,setup-envs]
+    name: Publish on GitHub and PyPi
+    needs: [generate-changelog,build-python,setup-envs]
     runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Select files to be uploaded for the release
-        run: |
-          mkdir release
-          cp -t release CHANGELOG.md git-release.sh Makefile
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+          path: dist
 
       - name: Upload the release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref }}
-          file: release/**
+          file: dist/**
           file_glob: true
           release_name: "Release ${{needs.setup-envs.outputs.version}}"
           body: "${{ needs.generate-changelog.outputs.release_body }}"
+
+      - name: Publish a Python distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
