@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.6] - 2022-04-25
+
+### Bug Fixes
+
+- Remove upper limit on python version
+- --no-verify as standard
+
+### Features
+
+- Python CI  and CD
+- Dependabot
+
 ## [0.0.5] - 2022-04-24
 
 ### Bug Fixes
@@ -15,6 +27,10 @@ All notable changes to this project will be documented in this file.
 - --comment flag
 - Moved to python
 - Automated versioning
+
+### Miscellaneous Tasks
+
+- Update changelog for v0.0.5 [skip pre-commit.ci]
 
 ## [0.0.4] - 2022-04-24
 
