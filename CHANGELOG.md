@@ -14,6 +14,10 @@ All notable changes to this project will be documented in this file.
 - Python CI  and CD
 - Dependabot
 
+### Miscellaneous Tasks
+
+- Update changelog for v0.0.6 [skip pre-commit.ci]
+
 ## [0.0.5] - 2022-04-24
 
 ### Bug Fixes
