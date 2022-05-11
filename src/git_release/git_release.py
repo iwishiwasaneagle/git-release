@@ -12,6 +12,7 @@ import git
 import pathlib
 from loguru import logger
 
+_PARSER = None
 
 def setup_ap() -> ap.ArgumentParser:  # pragma: no cover
     parser = ap.ArgumentParser(prog="git-release")
@@ -46,7 +47,6 @@ def setup_ap() -> ap.ArgumentParser:  # pragma: no cover
     semver_behaviour.add_argument(
         "--semver",
         type=validate_semver,
-        default=get_current_repo_version(),
         help="Custom semantic version. Use --no-inc to use as is.",
     )
 
@@ -80,7 +80,8 @@ def setup_ap() -> ap.ArgumentParser:  # pragma: no cover
         help="Don't increment " "anything",
         default=False,
     )
-
+    global _PARSER
+    _PARSER = parser
     return parser
 
 
@@ -97,7 +98,11 @@ def main():  # pragma: no cover
         )
         exit(1)
 
-    semver = args.semver
+    if args.semver is None:
+        semver = get_current_repo_version()
+    else:
+        semver = args.semver
+
     if not args.no_inc:
         if args.inc_major:
             semver = increment_major_semver_by_one(semver)
@@ -186,6 +191,8 @@ def get_repo(path: Optional[pathlib.Path] = None) -> git.repo:
         return repo
     except git.exc.InvalidGitRepositoryError as e:
         logger.critical("git-release was run outwith a valid git repository")
+        global _PARSER
+        _PARSER.print_help()
         exit(1)
 
 
