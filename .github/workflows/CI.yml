@@ -33,7 +33,9 @@ jobs:
             tests/requirements.txt
 
     - name: Install dependencies
-      run: pip install -r requirements.txt -r tests/requirements.txt
+      run: | 
+        pip install -r requirements.txt -r tests/requirements.txt
+        cargo install git-cliff
 
     - name: set pythonpath
       run: |
