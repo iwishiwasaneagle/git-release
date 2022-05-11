@@ -131,7 +131,7 @@ class SemVer:
     patch: int
 
     def __int__(self):
-        shift = max([len(bin(f)[2:]) for f in (self.major, self.minor, self.patch)])
+        shift = 16
         return (self.major << 2 * shift) + (self.minor << shift) + self.patch
 
     def __eq__(self, other: object):
