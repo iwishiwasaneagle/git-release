@@ -63,13 +63,13 @@ def setup_ap() -> ap.ArgumentParser:  # pragma: no cover
         "--minor",
         "-m",
         dest="inc_minor",
+        default=True,
         action="store_true",
         help="Increment the minor version by 1 (resets patch)",
     )
     increment.add_argument(
         "--patch",
         "-P",
-        default=True,
         action="store_true",
         help="Increment the patch version by 1 (default behaviour)",
         dest="inc_patch",
