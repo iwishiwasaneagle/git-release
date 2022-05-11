@@ -2,11 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2022-05-11
+
+### Bug Fixes
+
+- Method of comparing semvers was flawed. Needed constant shift value otherwise 0.0.10 > 0.1.0 as 0.1.1 would be assigned 3 and  0.0.10 would be assigned 10
+- Make  updating  minor default to  stay within semver 2.0 guidlines
+- Don't find git-cliff binary twice
+
+### Documentation
+
+- Pypi shields
+
+### Refator
+
+- Handle getting current semver better. means -h can be called outwith a repo
+
 ## [0.1.0] - 2022-04-25
 
 ### Documentation
 
 - Update README
+
+### Miscellaneous Tasks
+
+- Update changelog for v0.1.0 [skip pre-commit.ci]
 
 ## [0.0.10] - 2022-04-25
 
