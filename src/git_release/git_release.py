@@ -89,7 +89,8 @@ def main():  # pragma: no cover
     parser = setup_ap()
     args = parser.parse_args()
 
-    if not args.comment and find_git_cliff() is None:
+    git_cliff_bin = find_git_cliff()
+    if not args.comment and git_cliff_bin is None:
         logger.critical(
             f"--comment was not set, and git-cliff cannot be found within $PATH."
             f" Either install git-cliff or add a comment when rerunning."
@@ -109,8 +110,6 @@ def main():  # pragma: no cover
             f"You have chosen not to increment the semantic version. This "
             f"may cause errors within Git"
         )
-
-    git_cliff_bin = find_git_cliff()
 
     if args.comment:
         message = args.comment
