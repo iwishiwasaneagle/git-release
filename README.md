@@ -4,7 +4,8 @@
 [![CI](https://github.com/iwishiwasaneagle/git-release/actions/workflows/CI.yml/badge.svg)](https://github.com/iwishiwasaneagle/git-release/actions/workflows/CI.yml)
 [![License](https://img.shields.io/github/license/iwishiwasaneagle/git-release)](https://github.com/iwishiwasaneagle/git-release/blob/master/LICENSE.txt)
 ![OS: Linux](https://img.shields.io/badge/Supported%20OS-Linux,%20Mac-informational)
-
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/git-release)](https://pypi.org/project/git-release/)
+[![PyPI](https://img.shields.io/pypi/v/git-release)](https://pypi.org/project/git-release/)
 
 Easily generate tag-based releases. Uses the powerful [`git-cliff`](https://github.com/orhun/git-cliff) to generate changelogs. These can then be leveraged via [github actions](https://github.com/iwishiwasaneagle/git-release/blob/master/.github/workflows/CD.yml)
 
