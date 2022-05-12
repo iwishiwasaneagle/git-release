@@ -44,7 +44,7 @@ jobs:
         cache-key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-cargo
 
     - name: Install dependencies
-      run: | 
+      run: |
         pip install -r requirements.txt -r tests/requirements.txt
 
     - name: set pythonpath
