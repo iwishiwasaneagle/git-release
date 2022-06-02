@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes
 
 - Cache key for cargo that invalidates weekly
+- Was always incrementing minor
 
 ### Documentation
 
