@@ -63,15 +63,14 @@ def setup_ap() -> ap.ArgumentParser:  # pragma: no cover
         "--minor",
         "-m",
         dest="inc_minor",
-        default=True,
         action="store_true",
-        help="Increment the minor version by 1 (resets patch)",
+        help="Increment the minor version by 1 (resets patch). Default behaviour",
     )
     increment.add_argument(
         "--patch",
         "-P",
         action="store_true",
-        help="Increment the patch version by 1 (default behaviour)",
+        help="Increment the patch version by 1",
         dest="inc_patch",
     )
     increment.add_argument(
@@ -110,6 +109,9 @@ def main():  # pragma: no cover
             semver = increment_minor_semver_by_one(semver)
         elif args.inc_patch:
             semver = increment_patch_semver_by_one(semver)
+        else:
+            semver = increment_minor_semver_by_one(semver)
+        logger.debug(f"New version: {semver}")
     else:
         logger.warning(
             f"You have chosen not to increment the semantic version. This "

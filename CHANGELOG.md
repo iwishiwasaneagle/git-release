@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] - 2022-06-02
+
+### Bug Fixes
+
+- Cache key for cargo that invalidates weekly
+
+### Documentation
+
+- Codecov badge
+
+### Miscellaneous Tasks
+
+- Delete legacy file
+
+### Testing
+
+- Install git-cliff during CI
+
 ## [0.2.0] - 2022-05-11
 
 ### Bug Fixes
@@ -13,6 +31,10 @@ All notable changes to this project will be documented in this file.
 ### Documentation
 
 - Pypi shields
+
+### Miscellaneous Tasks
+
+- Update changelog for v0.2.0 [skip pre-commit.ci]
 
 ### Refator
 
