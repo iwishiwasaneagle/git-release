@@ -38,7 +38,7 @@ jobs:
             tests/requirements.txt
 
     - name: Install git-cliff
-      uses: baptiste0928/cargo-install@v2
+      uses: baptiste0928/cargo-install@v3
       with:
         crate: git-cliff
         cache-key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-cargo
