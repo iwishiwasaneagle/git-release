@@ -2,7 +2,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
     -   id: trailing-whitespace
     -   id: end-of-file-fixer
@@ -23,6 +23,6 @@ repos:
     -   id: mixed-line-ending
     -   id: trailing-whitespace
 -   repo: https://github.com/lovesegfault/beautysh
-    rev: v6.2.1
+    rev: v6.4.3
     hooks:
     -   id: beautysh
